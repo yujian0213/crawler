@@ -50,7 +50,7 @@ type BrowserFetch struct {
 
 // 模拟浏览器访问
 func (BrowserFetch) Get(url string) ([]byte, error) {
-	client := http.Client{}
+	client := &http.Client{}
 	req, err := http.NewRequest("get", url, nil)
 	if err != nil {
 		return nil, fmt.Errorf("get url failed:%v", err)
