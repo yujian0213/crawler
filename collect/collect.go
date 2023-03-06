@@ -2,6 +2,7 @@ package collect
 
 import (
 	"bufio"
+	"crawler/proxy"
 	"fmt"
 	"golang.org/x/net/html/charset"
 	"golang.org/x/text/encoding"
@@ -9,6 +10,7 @@ import (
 	"golang.org/x/text/transform"
 	"io"
 	"net/http"
+	"time"
 )
 
 type Fetcher interface {
@@ -46,11 +48,18 @@ func DeterminEncoding(r *bufio.Reader) encoding.Encoding {
 }
 
 type BrowserFetch struct {
+	Timeout time.Duration
+	Proxy   proxy.ProxyFunc
 }
 
-// 模拟浏览器访问
-func (BrowserFetch) Get(url string) ([]byte, error) {
-	client := &http.Client{}
+// Get 模拟浏览器访问
+func (b BrowserFetch) Get(url string) ([]byte, error) {
+	client := &http.Client{Timeout: b.Timeout}
+	if b.Proxy != nil {
+		transport := http.DefaultTransport.(*http.Transport)
+		transport.Proxy = b.Proxy
+		client.Transport = transport
+	}
 	req, err := http.NewRequest("get", url, nil)
 	if err != nil {
 		return nil, fmt.Errorf("get url failed:%v", err)
