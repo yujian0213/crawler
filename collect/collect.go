@@ -14,13 +14,13 @@ import (
 )
 
 type Fetcher interface {
-	Get(url string) ([]byte, error)
+	Get(url *Request) ([]byte, error)
 }
 type BaseFetch struct {
 }
 
-func (bf BaseFetch) Get(url string) ([]byte, error) {
-	resp, err := http.Get(url)
+func (bf BaseFetch) Get(req *Request) ([]byte, error) {
+	resp, err := http.Get(req.Url)
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
